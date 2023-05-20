@@ -80,7 +80,6 @@ def readInput(instructions):
                     print("klops")
                     exit(0)
             else:
-                #print(number, block)
                 print("klops")
                 exit(0)
 
