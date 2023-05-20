@@ -88,6 +88,8 @@ def readInput(instructions):
     instructions.instructions = {k: instructions.instructions[k] for k in sorted(instructions.instructions)}
     for index in todo:
         instructions.buildBuilding(index)
+        #po wybudowaniu moge usunac wykonane instrukcje co nieco przyspieszy faze druga
+        instructions.instructions.pop(index)
 
 #faza druga, budowanie budynkow o niskim priorytecie
 def secondPhase(instructions):
