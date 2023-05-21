@@ -93,8 +93,7 @@ def readInput(instructions):
 #faza druga, budowanie budynkow o niskim priorytecie
 def secondPhase(instructions):
     for instruction in instructions.instructions:
-        if instruction % 3 != 0:
-            instructions.buildBuilding(instruction)
+        instructions.buildBuilding(instruction)
 
 def displayStats(instructions, usedBlocksPhaseOne):
     print(str(usedBlocksPhaseOne))
