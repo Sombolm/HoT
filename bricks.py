@@ -4,8 +4,11 @@ from collections import Counter
 #zakładam ze w klockach z instrukcji nie ma O (wynika to z opisu strumienia wejsciowego)
 
 #klasa wrapper
+def end():
+    print("klops")
+    exit(0)
 class Instructions:
-    def __init__(self, boxLimit, instructionsLimit, instructionsLenghtLimit):
+    def __init__(self):
         #kontenery
         self.instructions = {}
         self.box = Counter()
@@ -15,38 +18,30 @@ class Instructions:
         self.blocksMissing = 0
         self.buildingsBuilt = 0
         self.buildingsNotBuilt = 0
-        #ograniczenia
-        self.boxLimit = boxLimit
-        self.instructionsLimit = instructionsLimit
-        self.instructionLengthLimit = instructionsLenghtLimit
 
     #dodaje klocek do pudelka
     def fillBox(self, block):
         self.box[block] += 1
-        if self.box[block] > self.boxLimit:
-            print("klops")
-            exit(0)
     #dodaje instrukcje do kontenera
     def addInstruction(self, instruction):
         index, block = instruction
         self.instructions.setdefault(index, []).append(block)
-        if len(block) > self.instructionLengthLimit:
-            print("klops")
-            exit(0)
 
     #buduje budynek
     def buildBuilding(self, index):
         instruction = self.instructions[index]
         removedBlocks = []
+        flag = False
         for block in instruction:
             if self.box[block] >= 1:
                 self.box[block] -= 1
                 removedBlocks.append(block)
             else:
+                flag = True
                 self.blocksMissing += 1
 
         #jezeli nie udalo sie zbudowac budynku
-        if len(removedBlocks) != len(instruction):
+        if flag:
             #wkladam klocki spowrotem do pudelka
             for block in removedBlocks:
                 self.box[block] += 1
@@ -57,34 +52,34 @@ class Instructions:
         self.blocksUsed += len(instruction)
 
 def readInput(instructions):
-    #set na instrukcje podzielne przez 3
+    # set na instrukcje podzielne przez 3
     todo = set()
-    #przetwarzanie strumienia wejsciowego
+    # przetwarzanie strumienia wejsciowego
     for line in sys.stdin:
-        #if line == " ":
-           # continue
         line = line.strip()
         if line:
             line = line.split(":")
-            number = int(line[0])
-            block = line[1].strip(";")
-            #walidacja danych
-            if 0 <= number and len(block) == 4 and all('A' <= b <= 'O' for b in block) and block.isupper():
-                if number == 0:
-                    instructions.fillBox(block)
-                elif (all('A' <= b <= 'N' for b in block)):
-                    instructions.addInstruction((number, block))
-                    if number % 3 == 0:
-                        todo.add(number)
+            if line[0].isdecimal():
+                number = int(line[0])
+                block = line[1].strip(";")
+                # walidacja danych
+                if 0 <= number and len(block) == 4 and all('A' <= b <= 'O' for b in block) and block.isupper():
+                    if number == 0:
+                        instructions.fillBox(block)
+                    elif (all(b != "O" for b in block)):
+                        instructions.addInstruction((number, block))
+                        if number % 3 == 0:
+                            todo.add(number)
+                    else:
+                        end()
                 else:
-                    print("klops")
-                    exit(0)
+                    end()
             else:
-                print("klops")
-                exit(0)
+                end()
 
     todo = sorted(todo)
     instructions.instructions = {k: instructions.instructions[k] for k in sorted(instructions.instructions)}
+
     for index in todo:
         instructions.buildBuilding(index)
         #po wybudowaniu moge usunac wykonane instrukcje co nieco przyspieszy faze druga
@@ -104,7 +99,7 @@ def displayStats(instructions, usedBlocksPhaseOne):
     print(str(instructions.buildingsNotBuilt))
 
 def main():
-    instructions = Instructions(10000000, 1000, 5000)
+    instructions = Instructions()
 
     #readInput polaczylem z faza pierwsza, mimo dodatkowego seta todo jest to szybsze niz dwukrotne iterowanie po instrukcjach
     readInput(instructions)
