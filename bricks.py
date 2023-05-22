@@ -1,33 +1,35 @@
 import sys
-#import time
+# import time
 from collections import Counter
-#zakładam ze w klockach z instrukcji nie ma O (wynika to z opisu strumienia wejsciowego)
 
-#klasa wrapper
+
 def end():
     print("klops")
     exit(0)
+
+# klasa wrapper
 class Instructions:
     def __init__(self):
-        #kontenery
+        # kontenery
         self.instructions = {}
         self.box = Counter()
 
-        #zmienne do zliczania danych
+        # zmienne do zliczania danych
         self.blocksUsed = 0
         self.blocksMissing = 0
         self.buildingsBuilt = 0
         self.buildingsNotBuilt = 0
 
-    #dodaje klocek do pudelka
+    # dodaje klocek do pudelka
     def fillBox(self, block):
         self.box[block] += 1
-    #dodaje instrukcje do kontenera
+
+    # dodaje instrukcje do kontenera
     def addInstruction(self, instruction):
         index, block = instruction
         self.instructions.setdefault(index, []).append(block)
 
-    #buduje budynek
+    # buduje budynek
     def buildBuilding(self, index):
         instruction = self.instructions[index]
         removedBlocks = []
@@ -40,9 +42,9 @@ class Instructions:
                 flag = True
                 self.blocksMissing += 1
 
-        #jezeli nie udalo sie zbudowac budynku
+        # jezeli nie udalo sie zbudowac budynku
         if flag:
-            #wkladam klocki spowrotem do pudelka
+            # wkladam klocki spowrotem do pudelka
             for block in removedBlocks:
                 self.box[block] += 1
             self.buildingsNotBuilt += 1
@@ -50,6 +52,7 @@ class Instructions:
 
         self.buildingsBuilt += 1
         self.blocksUsed += len(instruction)
+
 
 def readInput(instructions):
     # set na instrukcje podzielne przez 3
@@ -82,13 +85,15 @@ def readInput(instructions):
 
     for index in todo:
         instructions.buildBuilding(index)
-        #po wybudowaniu moge usunac wykonane instrukcje co nieco przyspieszy faze druga
+        # po wybudowaniu moge usunac wykonane instrukcje co nieco przyspieszy faze druga
         instructions.instructions.pop(index)
 
-#faza druga, budowanie budynkow o niskim priorytecie
+
+# faza druga, budowanie budynkow o niskim priorytecie
 def secondPhase(instructions):
     for instruction in instructions.instructions:
         instructions.buildBuilding(instruction)
+
 
 def displayStats(instructions, usedBlocksPhaseOne):
     print(str(usedBlocksPhaseOne))
@@ -98,21 +103,23 @@ def displayStats(instructions, usedBlocksPhaseOne):
     print(str(instructions.buildingsBuilt))
     print(str(instructions.buildingsNotBuilt))
 
+
 def main():
     instructions = Instructions()
 
-    #readInput polaczylem z faza pierwsza, mimo dodatkowego seta todo jest to szybsze niz dwukrotne iterowanie po instrukcjach
+    # readInput polaczylem z faza pierwsza, mimo dodatkowego seta todo jest to szybsze niz dwukrotne iterowanie po instrukcjach
     readInput(instructions)
-    #pobieram liczbe uzytych klockow w fazie pierwszej i zeruje licznik
+    # pobieram liczbe uzytych klockow w fazie pierwszej i zeruje licznik
     usedBlocksPhaseOne = instructions.blocksUsed
     instructions.blocksUsed = 0
-    #druga faza
+    # druga faza
     secondPhase(instructions)
-    #wyswietlanie statystyk
+    # wyswietlanie statystyk
     displayStats(instructions, usedBlocksPhaseOne)
 
+
 if __name__ == "__main__":
-    #start = time.process_time()
+    # start = time.process_time()
     main()
-    #end = time.process_time()
-    #print("Execution time: ", end - start)
+    # end = time.process_time()
+    # print("Execution time: ", end - start)
